@@ -3,6 +3,7 @@ import operator
 import binascii
 import string
 import math
+from itertools import starmap
 
 from nltk.corpus import wordnet
 import nltk.probability
@@ -50,10 +51,11 @@ def detect_single_byte(strings, map_fn=map) -> str:
     crack_attempt = map_fn(crack_single_byte, strings)
 
     def contains_only_english(s):
-        if s is None:
+        key, text = s
+        if text is None:
             return False
 
-        return not (set(s) - set(string.printable))
+        return not (set(text) - set(string.printable))
 
     return filter(contains_only_english, crack_attempt)
 

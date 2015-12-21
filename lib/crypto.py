@@ -35,6 +35,9 @@ def aes_is_ecb(ciphertext: bytes, key_length=16) -> bool:
 def pkcs7(data: bytes, length=16) -> bytes:
     pad_len = (math.ceil(len(data) / length) * length) - len(data)
 
+    if pad_len == 0:
+        pad_len = length
+
     return data + bytes([pad_len]*pad_len)
 
 

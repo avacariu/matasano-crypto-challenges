@@ -7,4 +7,8 @@ test_data = [
 ]
 
 for data, expect in test_data:
-    assert validate_pkcs7_padding(data) == expect
+    try:
+        print(data)
+        print(validate_pkcs7_padding(data))
+    except:
+        print("Exception thrown")

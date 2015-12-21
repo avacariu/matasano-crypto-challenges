@@ -106,15 +106,9 @@ def detect_ecb_cbc(oracle, blocksize=16) -> str:
 
 
 def validate_pkcs7_padding(padded: bytes) -> bytes:
-    padded_array = bytearray(padded)
-    while padded_array[0] in string.printable.encode():
-        padded_array.pop(0)
-
-    all_equal = all(itertools.starmap(operator.eq, pairwise(padded_array)))
-
-    if all_equal and padded_array[0] == len(padded_array):
-        return True, padded[:-len(padded_array)]
-
-    return False
-
-
+    last_byte = padded[-1]
+    padding = padded[-last_byte:]
+    if len(set(padding)) == 1:
+        return True, padded[:-last_byte]
+    else:
+        raise Exception("Invalid padding")

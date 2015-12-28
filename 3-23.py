@@ -10,7 +10,6 @@ def test(y, expect, twister):
     y ^= (y << twister.t) & twister.c
     y ^= (y >> twister.l)
 
-    print(y, expect)
     assert y == expect
 
 
@@ -64,10 +63,7 @@ def untemper(z, twister):
 # generate a few more values to test whether our spliced generator works
 # properly
 expect_test_outputs = [twister.extract_number() for i in range(twister.n)]
-
 twister.MT = [untemper(z, twister) for z in outputs]
-
 test_outputs = [twister.extract_number() for i in range(twister.n)]
 
-for expect, output in zip(expect_test_outputs, test_outputs):
-    assert expect == output
+assert expect_test_outputs == test_outputs

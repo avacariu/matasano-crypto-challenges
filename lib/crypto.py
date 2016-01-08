@@ -68,8 +68,8 @@ def aes_cbc_decrypt(key: bytes, ciphertext: bytes, iv=b'\x00'*16) -> bytes:
     return b"".join(plaintext)
 
 
-def aes_ctr(key: bytes, text: bytes, nonce=0) -> bytes:
-    ctr = nonce
+def aes_ctr(key: bytes, text: bytes, counter=0) -> bytes:
+    ctr = counter
     result = []
     for block in chunks(text, 16):
         ctr_bytes = bytes(8) + ctr.to_bytes(length=8, byteorder='little')

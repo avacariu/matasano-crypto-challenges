@@ -40,7 +40,7 @@ def insecure_compare(test, sig):
     for a, b in zip(test_sig, sig):
         if a != b:
             return False
-        time.sleep(0.5)
+        time.sleep(0.05)
 
     return True
 
@@ -69,19 +69,23 @@ def determine_mac(text, server='http://localhost:5000'):
     def guess(sig_c):
         signature, c = sig_c
         guess_sig = (signature + c).ljust(40, 'x')
-        rv = requests.get(rest_path.format(string=text, sig=guess_sig))
 
-        num_correct = int(rv.elapsed.total_seconds() / .5)
-        if num_correct > len(signature):
-            return c
-        return False
+        total_time = 0
+        iterations = 5
 
+        for i in range(iterations):
+            rv = requests.get(rest_path.format(string=text, sig=guess_sig))
+            total_time += rv.elapsed.total_seconds()
+
+        return c, total_time
 
     with ThreadPoolExecutor(max_workers=len(string.hexdigits)) as ex:
         for pos in range(40):
             res = ex.map(guess, itertools.zip_longest([signature], string.hexdigits,
                                                      fillvalue=signature))
-            signature += [x for x in res if x].pop()
+
+            times = sorted(res, key=lambda x: x[1])
+            signature += times.pop()[0]
 
     return signature
 

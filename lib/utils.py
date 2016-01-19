@@ -29,4 +29,14 @@ def pairwise(iterable):
     next(b, None)
     return zip(a, b)
 
+def modexp(number, power, mod):
 
+    s = 1
+
+    while power != 0:
+        if power & 1:
+            s = (s * number) % mod
+        power >>= 1
+        number = (number * number) % mod;
+
+    return s

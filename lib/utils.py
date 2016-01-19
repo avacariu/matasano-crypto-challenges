@@ -29,6 +29,7 @@ def pairwise(iterable):
     next(b, None)
     return zip(a, b)
 
+# this function is based on the code in Applied Cryptography by Bruce Schneier
 def modexp(number, power, mod):
 
     s = 1

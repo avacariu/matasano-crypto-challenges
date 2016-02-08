@@ -124,9 +124,50 @@ class Network:
                 else:
                     print("Got invalid message to None (ignoring):", msg)
                     continue
+
             if dest == 'alice':
+
+                # check if bob is sending B to Alice
+                if self.eve:
+                    if isinstance(msg, int):
+                        msg = p
+
+                    # check if Bob is sending ciphertext
+                    try:
+                        ct, iv = msg
+                    except (ValueError, TypeError):
+                        pass
+                    else:
+                        # try to decrypt for funsies
+                        key = gen_key(0)    # since p**a mod p == 0
+                        pt = aes_cbc_decrypt(key, ct, iv)
+                        print("MITM from alice\t\t", pt)
+
                 self.alice.msg_queue.put(msg)
+
             elif dest == 'bob':
+
+                if self.eve:
+                    # check if Alice is sending (p, g, A) to Bob
+                    try:
+                        _p, _g, _A = msg
+                    except (ValueError, TypeError):
+                        pass
+                    else:
+                        msg = (_p, _g, p)
+
+                    # check if Alice is sending ciphertext
+                    try:
+                        ct, iv = msg
+                    except (ValueError, TypeError):
+                        pass
+                    else:
+                        # try to decrypt for funsies
+                        key = gen_key(0)    # since p**a mod p == 0
+                        pt = aes_cbc_decrypt(key, ct, iv)
+                        print("MITM from bob\t\t", pt)
+
+
                 self.bob.msg_queue.put(msg)
             else:
                 print("Got invalid destination (ignoring):", dest)
@@ -134,7 +175,6 @@ class Network:
 
         self.alice.join()
         self.bob.join()
-        print("Done running.")
 
-network = Network()
+network = Network(malicious=True)
 network.run()

@@ -1,4 +1,4 @@
-import lib.sha1
+from lib.hash import Sha1Hash
 from lib.utils import chunks
 import os
 import struct
@@ -17,11 +17,11 @@ def compute_padding(message):
     return message[message_byte_length:]
 
 def verify(message, sig):
-    return lib.sha1.Sha1Hash().update(key + message).digest() == sig
+    return Sha1Hash().update(key + message).digest() == sig
 
 original_message = b"comment1=cooking%20MCs;userdata=foo;comment2=%20like%20a%20pound%20of%20bacon"
 
-sha1_hash = lib.sha1.Sha1Hash()
+sha1_hash = Sha1Hash()
 
 om_digest = sha1_hash.update(key + original_message).digest()
 
@@ -42,7 +42,7 @@ for key_size in possible_key_sizes:
 
     # make the SHA-1 state match the one from the original hash
     # TODO: Figure out why padding is needed here when we're doing this
-    sha1_hash = lib.sha1.Sha1Hash()
+    sha1_hash = Sha1Hash()
     sha1_hash.update(some_key + original_message + padding)
     sha1_hash._h = a, b, c, d, e
 

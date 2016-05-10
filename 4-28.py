@@ -1,4 +1,4 @@
-from lib.sha1 import sha1
+from lib.hash import sha1
 import os
 
 key = os.urandom(16)

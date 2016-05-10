@@ -4,10 +4,12 @@ import random
 import string
 import itertools
 import operator
+import codecs
+import subprocess
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import openssl
 
-from .utils import xor, chunks, pairwise
+from .utils import xor, chunks, pairwise, invmod
 
 def aes_ecb_decrypt(key: bytes, ciphertext: bytes) -> bytes:
     cipher = Cipher(algorithms.AES(key), modes.ECB(), backend=openssl.backend)
@@ -128,3 +130,30 @@ def validate_pkcs7_padding(padded: bytes) -> bytes:
         return True, padded[:-last_byte]
     else:
         raise Exception("Invalid padding")
+
+def _primegen(size="1024"):
+    args = ["openssl", "prime", "-generate", "-bits", size]
+    return int(subprocess.check_output(args).decode())
+
+def _str2int(string):
+    return int(codecs.encode(string.encode(), "hex"), 16)
+
+def _int2str(integer):
+    return codecs.decode(hex(integer)[2:], "hex").decode()
+
+class RSA:
+    def __init__(self, p=None, q=None):
+        self.p = p if p is not None else _primegen()
+        self.q = q if q is not None else _primegen()
+
+        self.n = self.p * self.q
+        self.e = 3
+
+        et = (self.p - 1) * (self.q - 1)
+        self.d = invmod(self.e, et)
+
+    def encrypt(self, plaintext: str):
+        return pow(_str2int(plaintext), self.e, self.n)
+
+    def decrypt(self, ciphertext: int):
+        return _int2str(pow(ciphertext, self.d, self.n))

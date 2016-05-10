@@ -41,3 +41,23 @@ def modexp(number, power, mod):
         number = (number * number) % mod;
 
     return s
+
+def extended_gcd(a, b):
+    s, t, r             = 0, 1, b
+    old_s, old_t, old_r = 1, 0, a
+
+    while r != 0:
+        quotient = old_r // r
+        old_r, r = r, old_r - quotient*r
+        old_s, s = s, old_s - quotient*s
+        old_t, t = t, old_t - quotient*t
+
+    return (old_r, (old_s, old_t))
+
+def invmod(a, m):
+    g, (x, y) = extended_gcd(a, m)
+
+    if g != 1:
+        raise Exception("Modular inverse does not exist")
+
+    return x % m
